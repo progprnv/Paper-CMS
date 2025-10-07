@@ -1,0 +1,300 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Header -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body bg-gradient text-white text-center p-4">
+                    <i class="bi bi-upload display-4 mb-3"></i>
+                    <h2 class="fw-bold mb-2">Submit Your Research Paper</h2>
+                    <p class="mb-0 opacity-75">Share your research with the academic community</p>
+                </div>
+            </div>
+
+            <!-- Submission Form -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-5">
+                    <form method="POST" enctype="multipart/form-data" id="paperSubmissionForm">
+                        {{ form.hidden_tag() }}
+                        
+                        <!-- Paper Title -->
+                        <div class="mb-4">
+                            {{ form.title.label(class="form-label fw-semibold") }}
+                            {{ form.title(class="form-control form-control-lg" + (" is-invalid" if form.title.errors else "")) }}
+                            {% if form.title.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.title.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Choose a clear, descriptive title for your research paper
+                            </div>
+                        </div>
+
+                        <!-- Abstract -->
+                        <div class="mb-4">
+                            {{ form.abstract.label(class="form-label fw-semibold") }}
+                            {{ form.abstract(class="form-control", rows="8", placeholder="Provide a comprehensive abstract of your research...", **{"data-bs-toggle": "tooltip", "title": "Abstract should be 100-5000 characters"}) }}
+                            {% if form.abstract.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.abstract.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Abstract should summarize your research objectives, methodology, results, and conclusions
+                            </div>
+                        </div>
+
+                        <!-- Keywords -->
+                        <div class="mb-4">
+                            {{ form.keywords.label(class="form-label fw-semibold") }}
+                            {{ form.keywords(class="form-control", placeholder="machine learning, artificial intelligence, neural networks") }}
+                            {% if form.keywords.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.keywords.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Separate keywords with commas to help others discover your research
+                            </div>
+                        </div>
+
+                        <!-- Conference and Categories Row -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                {{ form.conference_id.label(class="form-label fw-semibold") }}
+                                {{ form.conference_id(class="form-select" + (" is-invalid" if form.conference_id.errors else "")) }}
+                                {% if form.conference_id.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.conference_id.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6">
+                                {{ form.categories.label(class="form-label fw-semibold") }}
+                                <div class="categories-container border rounded p-3" style="max-height: 200px; overflow-y: auto;">
+                                    {% for subfield in form.categories %}
+                                        <div class="form-check">
+                                            {{ subfield(class="form-check-input") }}
+                                            {{ subfield.label(class="form-check-label") }}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                {% if form.categories.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.categories.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Select all relevant categories for your research
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- File Upload -->
+                        <div class="mb-4">
+                            {{ form.file.label(class="form-label fw-semibold") }}
+                            <div class="file-upload-area border border-2 border-dashed rounded p-4 text-center">
+                                <div class="upload-content">
+                                    <i class="bi bi-cloud-upload display-4 text-primary mb-3"></i>
+                                    <h6 class="fw-semibold mb-2">Drag and drop your paper here</h6>
+                                    <p class="text-muted mb-3">or click to browse files</p>
+                                    {{ form.file(class="form-control d-none", accept=".pdf,.doc,.docx") }}
+                                    <button type="button" class="btn btn-outline-primary" onclick="document.querySelector('input[type=file]').click()">
+                                        <i class="bi bi-folder-open me-2"></i>Choose File
+                                    </button>
+                                </div>
+                                <div class="file-info mt-3" style="display: none;"></div>
+                            </div>
+                            {% if form.file.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.file.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Accepted formats: PDF, DOC, DOCX (Maximum size: 16MB)
+                            </div>
+                        </div>
+
+                        <!-- Guidelines -->
+                        <div class="alert alert-info mb-4">
+                            <h6 class="alert-heading">
+                                <i class="bi bi-lightbulb me-2"></i>Submission Guidelines
+                            </h6>
+                            <ul class="mb-0 small">
+                                <li>Ensure your paper follows the conference formatting requirements</li>
+                                <li>All authors must be listed in the paper document</li>
+                                <li>Check for plagiarism before submission</li>
+                                <li>Review deadlines and conference dates carefully</li>
+                            </ul>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary me-md-2">
+                                <i class="bi bi-arrow-left me-2"></i>Cancel
+                            </a>
+                            {{ form.submit(class="btn btn-success btn-lg", **{"data-loading-text": "Submitting..."}) }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('paperSubmissionForm');
+    const fileInput = document.querySelector('input[type="file"]');
+    const uploadArea = document.querySelector('.file-upload-area');
+    const uploadContent = document.querySelector('.upload-content');
+    const fileInfo = document.querySelector('.file-info');
+    
+    // File upload handling
+    fileInput.addEventListener('change', function(e) {
+        if (e.target.files.length > 0) {
+            showFileInfo(e.target.files[0]);
+        }
+    });
+    
+    // Click to upload
+    uploadArea.addEventListener('click', function(e) {
+        if (e.target !== fileInput) {
+            fileInput.click();
+        }
+    });
+    
+    function showFileInfo(file) {
+        uploadContent.style.display = 'none';
+        fileInfo.style.display = 'block';
+        fileInfo.innerHTML = `
+            <div class="d-flex align-items-center justify-content-center">
+                <i class="bi bi-file-earmark-pdf text-danger me-2 fs-4"></i>
+                <div class="text-start">
+                    <div class="fw-semibold">${file.name}</div>
+                    <small class="text-muted">${formatFileSize(file.size)}</small>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-danger ms-3" onclick="clearFile()">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </div>
+        `;
+    }
+    
+    window.clearFile = function() {
+        fileInput.value = '';
+        uploadContent.style.display = 'block';
+        fileInfo.style.display = 'none';
+    };
+    
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+    
+    // Form validation
+    form.addEventListener('submit', function(e) {
+        const submitBtn = form.querySelector('button[type="submit"], input[type="submit"]');
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Submitting...';
+            
+            // Re-enable button if form validation fails
+            setTimeout(() => {
+                if (!form.checkValidity()) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                }
+            }, 100);
+        }
+    });
+    
+    // Character counter for abstract
+    const abstractField = document.querySelector('textarea[name="abstract"]');
+    if (abstractField) {
+        const charCounter = document.createElement('div');
+        charCounter.className = 'form-text text-end';
+        charCounter.style.fontSize = '0.875rem';
+        abstractField.parentNode.appendChild(charCounter);
+        
+        function updateCharCount() {
+            const count = abstractField.value.length;
+            const max = 5000;
+            const min = 100;
+            
+            charCounter.innerHTML = `${count}/${max} characters`;
+            
+            if (count < min) {
+                charCounter.className = 'form-text text-end text-warning';
+                charCounter.innerHTML += ` (minimum ${min})`;
+            } else if (count > max * 0.9) {
+                charCounter.className = 'form-text text-end text-warning';
+            } else {
+                charCounter.className = 'form-text text-end text-muted';
+            }
+        }
+        
+        abstractField.addEventListener('input', updateCharCount);
+        updateCharCount();
+    }
+});
+</script>
+
+<style>
+.file-upload-area {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.file-upload-area:hover {
+    border-color: #667eea !important;
+    background-color: rgba(102, 126, 234, 0.05);
+}
+
+.categories-container {
+    background-color: #f8f9fa;
+}
+
+.form-check {
+    margin-bottom: 0.5rem;
+}
+
+.form-check-input:checked {
+    background-color: #667eea;
+    border-color: #667eea;
+}
+
+.alert-info {
+    background: linear-gradient(135deg, rgba(79, 172, 254, 0.1) 0%, rgba(0, 242, 254, 0.1) 100%);
+    border-left: 4px solid #4facfe;
+    border-radius: 12px;
+}
+</style>
+{% endblock %}

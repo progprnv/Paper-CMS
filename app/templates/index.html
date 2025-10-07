@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Paper-CMS - Academic Paper Management System{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container">
+        <h1>Paper-CMS</h1>
+        <p>Streamline your academic paper management workflow</p>
+        <div class="d-flex justify-content-center" style="gap: 1rem;">
+            <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Get Started</a>
+            <a href="{{ url_for('auth.login') }}" class="btn btn-outline-primary">Sign In</a>
+        </div>
+    </div>
+</section>
+
+<!-- Main Content -->
+<div class="container">
+    <!-- Stats Section -->
+    <section class="stats-grid" style="margin-top: 4rem;">
+        <div class="stat-card">
+            <div class="stat-number">0</div>
+            <div class="stat-label">Papers Submitted</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">0</div>
+            <div class="stat-label">Reviews Completed</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">0</div>
+            <div class="stat-label">Papers Published</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">0</div>
+            <div class="stat-label">Active Reviewers</div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section style="margin: 4rem 0;">
+        <h2 class="text-center mb-8">Key Features</h2>
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <div style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem;">📄</div>
+                        <h3>Paper Submission</h3>
+                        <p class="text-muted">Easy upload and submission process for academic papers with automated formatting checks.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <div style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem;">👥</div>
+                        <h3>Peer Review</h3>
+                        <p class="text-muted">Streamlined peer review process with automated reviewer assignment and progress tracking.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <div style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem;">📊</div>
+                        <h3>Analytics</h3>
+                        <p class="text-muted">Comprehensive analytics and reporting for tracking submission and review metrics.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Recent Papers Section -->
+    <section style="margin: 4rem 0;">
+        <h2 class="text-center mb-6">Recent Submissions</h2>
+        <div class="card">
+            <div class="card-body">
+                <div class="text-center py-5">
+                    <h4>No Papers Submitted Yet</h4>
+                    <p class="text-muted">Be the first to submit a paper to get started!</p>
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-primary mt-3">Submit Your First Paper</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section style="margin: 4rem 0;">
+        <h2 class="text-center mb-8">How It Works</h2>
+        <div class="row">
+            <div class="col text-center">
+                <div style="width: 80px; height: 80px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; margin: 0 auto 1rem;">1</div>
+                <h4>Submit Paper</h4>
+                <p class="text-muted">Upload your academic paper with metadata and select review preferences.</p>
+            </div>
+            <div class="col text-center">
+                <div style="width: 80px; height: 80px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; margin: 0 auto 1rem;">2</div>
+                <h4>Peer Review</h4>
+                <p class="text-muted">Our system assigns qualified reviewers who provide detailed feedback.</p>
+            </div>
+            <div class="col text-center">
+                <div style="width: 80px; height: 80px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; margin: 0 auto 1rem;">3</div>
+                <h4>Get Results</h4>
+                <p class="text-muted">Receive comprehensive feedback and publication decisions.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="text-center" style="margin: 4rem 0; padding: 3rem; background: var(--gray-100); border-radius: var(--radius-lg);">
+        <h2>Ready to get started?</h2>
+        <p class="text-muted mb-6">Start your academic publishing journey with Paper-CMS today.</p>
+        <a href="{{ url_for('auth.register') }}" class="btn btn-primary" style="font-size: 1.1rem; padding: 0.75rem 2rem;">Start Your First Submission</a>
+    </section>
+</div>
+{% endblock %}
