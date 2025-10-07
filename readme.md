@@ -230,6 +230,629 @@ coverage run -m pytest
 coverage report
 ```
 
+## 💻 Terminal Commands & Database Operations
+
+### Database Management Commands
+
+#### Initialize/Reset Database
+```bash
+# Drop and recreate all tables
+python -c "from app import create_app, db; app = create_app(); app.app_context().push(); db.drop_all(); db.create_all(); print('Database recreated!')"
+
+# Create tables without dropping existing ones
+python -c "from app import create_app, db; app = create_app(); app.app_context().push(); db.create_all(); print('Tables created!')"
+```
+
+#### User Management via Terminal
+
+##### Create Admin User
+```bash
+python -c "from app import create_app, db; from app.models import User, UserRole; from werkzeug.security import generate_password_hash; app = create_app(); app.app_context().push(); admin = User(name='Administrator', email='admin@paper-cms.com', role=UserRole.ADMIN, password_hash=generate_password_hash('admin123')); db.session.add(admin); db.session.commit(); print('Admin user created!')"
+```
+
+##### Create Author User
+```bash
+python -c "from app import create_app, db; from app.models import User, UserRole; from werkzeug.security import generate_password_hash; app = create_app(); app.app_context().push(); author = User(name='John Doe', email='author@example.com', role=UserRole.AUTHOR, password_hash=generate_password_hash('password123')); db.session.add(author); db.session.commit(); print('Author user created!')"
+```
+
+##### Create Reviewer User
+```bash
+python -c "from app import create_app, db; from app.models import User, UserRole; from werkzeug.security import generate_password_hash; app = create_app(); app.app_context().push(); reviewer = User(name='Jane Smith', email='reviewer@example.com', role=UserRole.REVIEWER, password_hash=generate_password_hash('password123')); db.session.add(reviewer); db.session.commit(); print('Reviewer user created!')"
+```
+
+##### List All Users
+```bash
+python -c "from app import create_app, db; from app.models import User; app = create_app(); app.app_context().push(); users = User.query.all(); print('All Users:'); [print(f'ID: {u.id}, Name: {u.name}, Email: {u.email}, Role: {u.role.value}') for u in users]"
+```
+
+##### Update User Role
+```bash
+# Change user role (replace email and role as needed)
+python -c "from app import create_app, db; from app.models import User, UserRole; app = create_app(); app.app_context().push(); user = User.query.filter_by(email='user@example.com').first(); user.role = UserRole.ADMIN; db.session.commit(); print(f'User {user.email} role updated to {user.role.value}')"
+```
+
+##### Delete User
+```bash
+python -c "from app import create_app, db; from app.models import User; app = create_app(); app.app_context().push(); user = User.query.filter_by(email='user@example.com').first(); db.session.delete(user); db.session.commit(); print('User deleted successfully')"
+```
+
+#### Paper Management via Terminal
+
+##### Create Sample Paper
+```bash
+python -c "from app import create_app, db; from app.models import Paper, User, PaperStatus; app = create_app(); app.app_context().push(); author = User.query.filter_by(role='AUTHOR').first(); paper = Paper(title='Sample Research Paper', abstract='This is a comprehensive abstract describing the research methodology, findings, and conclusions of this academic paper.', conference_name='ICML 2025', keywords='machine learning, AI, research', submitted_by=author.id, status=PaperStatus.SUBMITTED); paper.authors.append(author); db.session.add(paper); db.session.commit(); print('Sample paper created!')"
+```
+
+##### List All Papers
+```bash
+python -c "from app import create_app, db; from app.models import Paper; app = create_app(); app.app_context().push(); papers = Paper.query.all(); print('All Papers:'); [print(f'ID: {p.id}, Title: {p.title[:50]}..., Conference: {p.conference_name}, Status: {p.status.value}') for p in papers]"
+```
+
+##### Update Paper Status
+```bash
+# Change paper status
+python -c "from app import create_app, db; from app.models import Paper, PaperStatus; app = create_app(); app.app_context().push(); paper = Paper.query.get(1); paper.status = PaperStatus.ACCEPTED; db.session.commit(); print(f'Paper {paper.title} status updated to {paper.status.value}')"
+```
+
+##### Delete Paper
+```bash
+python -c "from app import create_app, db; from app.models import Paper; app = create_app(); app.app_context().push(); paper = Paper.query.get(1); db.session.delete(paper); db.session.commit(); print('Paper deleted successfully')"
+```
+
+#### Category Management via Terminal
+
+##### Create Categories
+```bash
+# Create Computer Science category
+python -c "from app import create_app, db; from app.models import Category; app = create_app(); app.app_context().push(); cat = Category(name='Computer Science', description='General computer science research', color='#007bff'); db.session.add(cat); db.session.commit(); print('Category created!')"
+
+# Create Machine Learning category
+python -c "from app import create_app, db; from app.models import Category; app = create_app(); app.app_context().push(); cat = Category(name='Machine Learning', description='AI and ML research papers', color='#28a745'); db.session.add(cat); db.session.commit(); print('Category created!')"
+
+# Create Data Science category
+python -c "from app import create_app, db; from app.models import Category; app = create_app(); app.app_context().push(); cat = Category(name='Data Science', description='Data analysis and statistics', color='#ffc107'); db.session.add(cat); db.session.commit(); print('Category created!')"
+```
+
+##### List All Categories
+```bash
+python -c "from app import create_app, db; from app.models import Category; app = create_app(); app.app_context().push(); categories = Category.query.all(); print('All Categories:'); [print(f'ID: {c.id}, Name: {c.name}, Color: {c.color}') for c in categories]"
+```
+
+##### Delete Category
+```bash
+python -c "from app import create_app, db; from app.models import Category; app = create_app(); app.app_context().push(); cat = Category.query.filter_by(name='Category Name').first(); db.session.delete(cat); db.session.commit(); print('Category deleted!')"
+```
+
+#### Review Management via Terminal
+
+##### Create Review
+```bash
+python -c "from app import create_app, db; from app.models import Review, Paper, User, ReviewRecommendation; app = create_app(); app.app_context().push(); reviewer = User.query.filter_by(role='REVIEWER').first(); paper = Paper.query.first(); review = Review(paper_id=paper.id, reviewer_id=reviewer.id, technical_quality=4, novelty=3, clarity=4, significance=3, score=7, recommendation=ReviewRecommendation.ACCEPT, comments='This is a well-written paper with solid methodology.', is_completed=True); db.session.add(review); db.session.commit(); print('Review created!')"
+```
+
+##### List All Reviews
+```bash
+python -c "from app import create_app, db; from app.models import Review; app = create_app(); app.app_context().push(); reviews = Review.query.all(); print('All Reviews:'); [print(f'ID: {r.id}, Paper: {r.paper_id}, Reviewer: {r.reviewer_id}, Score: {r.score}, Completed: {r.is_completed}') for r in reviews]"
+```
+
+#### Conference Management via Terminal
+
+##### Create Conference
+```bash
+python -c "from app import create_app, db; from app.models import Conference, ConferenceStatus; from datetime import datetime; app = create_app(); app.app_context().push(); conf = Conference(name='International Conference on Machine Learning', year=2025, submission_deadline=datetime(2025, 3, 15), status=ConferenceStatus.ACTIVE, description='Premier ML conference', reviews_per_paper=3); db.session.add(conf); db.session.commit(); print('Conference created!')"
+```
+
+##### List All Conferences
+```bash
+python -c "from app import create_app, db; from app.models import Conference; app = create_app(); app.app_context().push(); conferences = Conference.query.all(); print('All Conferences:'); [print(f'ID: {c.id}, Name: {c.name}, Year: {c.year}, Status: {c.status.value}') for c in conferences]"
+```
+
+### Advanced Query Operations
+
+#### Complex Data Queries
+
+##### Get Papers by Status
+```bash
+python -c "from app import create_app, db; from app.models import Paper, PaperStatus; app = create_app(); app.app_context().push(); papers = Paper.query.filter_by(status=PaperStatus.SUBMITTED).all(); print(f'Submitted Papers ({len(papers)}):'); [print(f'- {p.title} by {p.submitter.name}') for p in papers]"
+```
+
+##### Get Papers by Conference
+```bash
+python -c "from app import create_app, db; from app.models import Paper; app = create_app(); app.app_context().push(); papers = Paper.query.filter_by(conference_name='ICML 2025').all(); print(f'ICML 2025 Papers ({len(papers)}):'); [print(f'- {p.title}') for p in papers]"
+```
+
+##### Get Reviews by Paper
+```bash
+python -c "from app import create_app, db; from app.models import Review, Paper; app = create_app(); app.app_context().push(); paper = Paper.query.first(); reviews = Review.query.filter_by(paper_id=paper.id).all(); print(f'Reviews for {paper.title}:'); [print(f'- Score: {r.score}, Recommendation: {r.recommendation.value if r.recommendation else \"None\"}') for r in reviews]"
+```
+
+##### Get Papers by Author
+```bash
+python -c "from app import create_app, db; from app.models import Paper, User; app = create_app(); app.app_context().push(); author = User.query.filter_by(email='author@example.com').first(); papers = author.authored_papers; print(f'Papers by {author.name}:'); [print(f'- {p.title} ({p.status.value})') for p in papers]"
+```
+
+##### Get Dashboard Statistics
+```bash
+python -c "from app import create_app, db; from app.models import Paper, Review, User, PaperStatus; app = create_app(); app.app_context().push(); total_papers = Paper.query.count(); total_reviews = Review.query.count(); total_users = User.query.count(); submitted = Paper.query.filter_by(status=PaperStatus.SUBMITTED).count(); print(f'Dashboard Stats:'); print(f'- Total Papers: {total_papers}'); print(f'- Total Reviews: {total_reviews}'); print(f'- Total Users: {total_users}'); print(f'- Submitted Papers: {submitted}')"
+```
+
+### Bulk Operations
+
+#### Bulk User Creation
+```bash
+# Create multiple users at once
+python -c "
+from app import create_app, db
+from app.models import User, UserRole
+from werkzeug.security import generate_password_hash
+app = create_app()
+app.app_context().push()
+
+users_data = [
+    ('Alice Johnson', 'alice@university.edu', UserRole.AUTHOR),
+    ('Bob Wilson', 'bob@research.org', UserRole.REVIEWER),
+    ('Carol Davis', 'carol@institute.edu', UserRole.AUTHOR),
+    ('David Brown', 'david@college.edu', UserRole.REVIEWER)
+]
+
+for name, email, role in users_data:
+    user = User(
+        name=name,
+        email=email,
+        role=role,
+        password_hash=generate_password_hash('password123')
+    )
+    db.session.add(user)
+
+db.session.commit()
+print(f'Created {len(users_data)} users successfully!')
+"
+```
+
+#### Bulk Paper Status Update
+```bash
+# Update all submitted papers to under review
+python -c "from app import create_app, db; from app.models import Paper, PaperStatus; app = create_app(); app.app_context().push(); papers = Paper.query.filter_by(status=PaperStatus.SUBMITTED).all(); [setattr(p, 'status', PaperStatus.UNDER_REVIEW) for p in papers]; db.session.commit(); print(f'Updated {len(papers)} papers to UNDER_REVIEW status')"
+```
+
+### Data Export Commands
+
+#### Export Users to CSV Format
+```bash
+python -c "
+from app import create_app, db
+from app.models import User
+app = create_app()
+app.app_context().push()
+
+users = User.query.all()
+print('ID,Name,Email,Role,Created At,Is Active')
+for user in users:
+    print(f'{user.id},{user.name},{user.email},{user.role.value},{user.created_at},{user.is_active}')
+"
+```
+
+#### Export Papers to CSV Format
+```bash
+python -c "
+from app import create_app, db
+from app.models import Paper
+app = create_app()
+app.app_context().push()
+
+papers = Paper.query.all()
+print('ID,Title,Conference,Status,Submission Date,Author')
+for paper in papers:
+    title = paper.title.replace(',', ';')  # Handle commas in titles
+    print(f'{paper.id},{title},{paper.conference_name},{paper.status.value},{paper.submission_date},{paper.submitter.name}')
+"
+```
+
+### System Maintenance Commands
+
+#### Clean Up Orphaned Records
+```bash
+# Remove reviews without associated papers
+python -c "from app import create_app, db; from app.models import Review, Paper; app = create_app(); app.app_context().push(); orphaned = Review.query.filter(~Review.paper_id.in_(db.session.query(Paper.id))).all(); [db.session.delete(r) for r in orphaned]; db.session.commit(); print(f'Removed {len(orphaned)} orphaned reviews')"
+```
+
+#### Database Backup Query
+```bash
+# Get complete database dump
+python -c "
+from app import create_app, db
+from app.models import User, Paper, Review, Category, Conference
+app = create_app()
+app.app_context().push()
+
+print('=== DATABASE BACKUP ===')
+print(f'Users: {User.query.count()}')
+print(f'Papers: {Paper.query.count()}')
+print(f'Reviews: {Review.query.count()}')
+print(f'Categories: {Category.query.count()}')
+print(f'Conferences: {Conference.query.count()}')
+print('========================')
+"
+```
+
+### Performance Analysis Commands
+
+#### Database Size Analysis
+```bash
+python -c "
+from app import create_app, db
+from app.models import User, Paper, Review, Category, Conference, Affiliation
+app = create_app()
+app.app_context().push()
+
+tables = [
+    ('Users', User),
+    ('Papers', Paper),
+    ('Reviews', Review),
+    ('Categories', Category),
+    ('Conferences', Conference),
+    ('Affiliations', Affiliation)
+]
+
+print('Table Analysis:')
+for name, model in tables:
+    count = model.query.count()
+    print(f'{name}: {count} records')
+"
+```
+
+### Quick Setup Commands
+
+#### Complete System Setup (One Command)
+```bash
+# Initialize everything from scratch
+python -c "
+from app import create_app, db
+from app.models import User, UserRole, Category, Conference, ConferenceStatus
+from werkzeug.security import generate_password_hash
+from datetime import datetime
+
+app = create_app()
+app.app_context().push()
+
+# Recreate database
+db.drop_all()
+db.create_all()
+
+# Create admin
+admin = User(
+    name='Administrator',
+    email='admin@paper-cms.com',
+    role=UserRole.ADMIN,
+    password_hash=generate_password_hash('admin123')
+)
+db.session.add(admin)
+
+# Create default categories
+categories = [
+    ('Computer Science', 'General CS research', '#007bff'),
+    ('Machine Learning', 'AI and ML papers', '#28a745'),
+    ('Data Science', 'Data analysis research', '#ffc107'),
+    ('Software Engineering', 'Software development research', '#dc3545'),
+    ('Cybersecurity', 'Security and privacy research', '#6f42c1')
+]
+
+for name, desc, color in categories:
+    cat = Category(name=name, description=desc, color=color)
+    db.session.add(cat)
+
+# Create sample conference
+conf = Conference(
+    name='International Conference on Academic Research',
+    year=2025,
+    submission_deadline=datetime(2025, 6, 1),
+    status=ConferenceStatus.ACTIVE,
+    description='Premier academic research conference',
+    reviews_per_paper=3
+)
+db.session.add(conf)
+
+db.session.commit()
+print('✅ Complete system setup finished!')
+print('📧 Admin: admin@paper-cms.com / admin123')
+print('🏗️ Database: Initialized with sample data')
+print('📁 Categories: 5 default categories created')
+print('🎯 Conference: Sample conference created')
+"
+```
+
+### Terminal-Based Web Operations
+
+#### Simulate User Registration
+```bash
+# Register new user programmatically
+python -c "
+from app import create_app, db
+from app.models import User, UserRole
+from werkzeug.security import generate_password_hash
+
+app = create_app()
+app.app_context().push()
+
+# Check if email exists
+email = 'newuser@example.com'
+existing_user = User.query.filter_by(email=email).first()
+
+if existing_user:
+    print(f'❌ User with email {email} already exists')
+else:
+    new_user = User(
+        name='New User Name',
+        email=email,
+        role=UserRole.AUTHOR,
+        password_hash=generate_password_hash('newpassword123')
+    )
+    db.session.add(new_user)
+    db.session.commit()
+    print(f'✅ User {email} registered successfully!')
+"
+```
+
+#### Simulate Paper Submission
+```bash
+# Submit paper via terminal (simulating web form)
+python -c "
+from app import create_app, db
+from app.models import User, Paper, Category, PaperStatus
+from datetime import datetime
+
+app = create_app()
+app.app_context().push()
+
+# Get author (must exist)
+author = User.query.filter_by(role='AUTHOR').first()
+if not author:
+    print('❌ No author found. Create an author first.')
+    exit()
+
+# Create paper
+paper = Paper(
+    title='Automated Research Paper Management Systems: A Comprehensive Study',
+    abstract='This paper presents a detailed analysis of modern academic paper management systems, focusing on workflow optimization, peer review processes, and digital transformation in academic publishing. The research examines current challenges in traditional paper submission and review processes, proposing innovative solutions through web-based platforms. Our findings demonstrate significant improvements in efficiency, transparency, and user experience when implementing automated systems. The study includes comparative analysis of existing platforms, user satisfaction metrics, and recommendations for future development. Results indicate that digital transformation in academic publishing can reduce review times by up to 40% while maintaining quality standards.',
+    conference_name='International Conference on Digital Academic Publishing 2025',
+    keywords='academic publishing, peer review, workflow automation, digital transformation, research management',
+    submitted_by=author.id,
+    status=PaperStatus.SUBMITTED
+)
+
+# Add author to paper
+paper.authors.append(author)
+
+# Add categories if they exist
+cs_category = Category.query.filter_by(name='Computer Science').first()
+if cs_category:
+    paper.categories.append(cs_category)
+
+db.session.add(paper)
+db.session.commit()
+
+print(f'✅ Paper submitted successfully!')
+print(f'📄 Title: {paper.title}')
+print(f'👤 Author: {author.name}')
+print(f'🎯 Conference: {paper.conference_name}')
+print(f'📊 Status: {paper.status.value}')
+"
+```
+
+#### Simulate Review Submission
+```bash
+# Submit review via terminal
+python -c "
+from app import create_app, db
+from app.models import User, Paper, Review, ReviewRecommendation
+from datetime import datetime
+
+app = create_app()
+app.app_context().push()
+
+# Get reviewer and paper
+reviewer = User.query.filter_by(role='REVIEWER').first()
+paper = Paper.query.first()
+
+if not reviewer or not paper:
+    print('❌ Need both reviewer and paper to create review')
+    exit()
+
+review = Review(
+    paper_id=paper.id,
+    reviewer_id=reviewer.id,
+    technical_quality=4,
+    novelty=3,
+    clarity=4,
+    significance=3,
+    score=7,
+    recommendation=ReviewRecommendation.MINOR_REVISION,
+    comments='This paper presents interesting ideas on academic paper management systems. The methodology is sound and the results are promising. However, there are some areas that need improvement: 1) The literature review could be more comprehensive, 2) Some experimental details are missing, 3) The conclusion section needs strengthening. Overall, this is a solid contribution that would benefit from minor revisions.',
+    is_completed=True,
+    review_date=datetime.utcnow()
+)
+
+db.session.add(review)
+db.session.commit()
+
+print(f'✅ Review submitted successfully!')
+print(f'📄 Paper: {paper.title[:50]}...')
+print(f'👤 Reviewer: {reviewer.name}')
+print(f'⭐ Score: {review.score}/10')
+print(f'📋 Recommendation: {review.recommendation.value}')
+"
+```
+
+### Database Troubleshooting Commands
+
+#### Check Database Integrity
+```bash
+python -c "
+from app import create_app, db
+from app.models import User, Paper, Review, Category
+from sqlalchemy import text
+
+app = create_app()
+app.app_context().push()
+
+print('🔍 Database Integrity Check:')
+print('=' * 40)
+
+# Check for orphaned reviews
+orphaned_reviews = Review.query.filter(~Review.paper_id.in_(db.session.query(Paper.id))).count()
+print(f'Orphaned Reviews: {orphaned_reviews}')
+
+# Check for papers without authors
+papers_without_authors = Paper.query.filter(~Paper.id.in_(
+    db.session.query(Paper.id).join(Paper.authors)
+)).count()
+print(f'Papers without Authors: {papers_without_authors}')
+
+# Check for inactive users with active papers
+inactive_users_with_papers = db.session.query(User).filter(
+    User.is_active == False,
+    User.id.in_(db.session.query(Paper.submitted_by))
+).count()
+print(f'Inactive Users with Papers: {inactive_users_with_papers}')
+
+# Check database constraints
+try:
+    db.session.execute(text('PRAGMA foreign_key_check'))
+    print('Foreign Key Constraints: ✅ OK')
+except Exception as e:
+    print(f'Foreign Key Constraints: ❌ ERROR - {e}')
+
+print('=' * 40)
+print('🏁 Integrity check completed!')
+"
+```
+
+#### Fix Common Database Issues
+```bash
+# Fix orphaned records and inconsistencies
+python -c "
+from app import create_app, db
+from app.models import User, Paper, Review
+
+app = create_app()
+app.app_context().push()
+
+fixes_applied = []
+
+# Remove orphaned reviews
+orphaned_reviews = Review.query.filter(~Review.paper_id.in_(db.session.query(Paper.id))).all()
+if orphaned_reviews:
+    for review in orphaned_reviews:
+        db.session.delete(review)
+    fixes_applied.append(f'Removed {len(orphaned_reviews)} orphaned reviews')
+
+# Update papers without proper status
+papers_no_status = Paper.query.filter(Paper.status == None).all()
+if papers_no_status:
+    for paper in papers_no_status:
+        paper.status = 'SUBMITTED'
+    fixes_applied.append(f'Fixed status for {len(papers_no_status)} papers')
+
+db.session.commit()
+
+if fixes_applied:
+    print('🔧 Database fixes applied:')
+    for fix in fixes_applied:
+        print(f'  ✅ {fix}')
+else:
+    print('✅ No database issues found!')
+"
+```
+
+### System Monitoring Commands
+
+#### Real-time Activity Monitor
+```bash
+# Monitor recent system activity
+python -c "
+from app import create_app, db
+from app.models import User, Paper, Review
+from datetime import datetime, timedelta
+
+app = create_app()
+app.app_context().push()
+
+print('📊 System Activity Report')
+print('=' * 50)
+
+# Recent papers (last 7 days)
+week_ago = datetime.utcnow() - timedelta(days=7)
+recent_papers = Paper.query.filter(Paper.submission_date >= week_ago).count()
+print(f'📄 Papers submitted (last 7 days): {recent_papers}')
+
+# Recent reviews
+recent_reviews = Review.query.filter(Review.review_date >= week_ago).count()
+print(f'📝 Reviews completed (last 7 days): {recent_reviews}')
+
+# Active users (logged in recently)
+recent_users = User.query.filter(User.last_login >= week_ago).count()
+print(f'👥 Active users (last 7 days): {recent_users}')
+
+# Papers by status
+from app.models import PaperStatus
+for status in PaperStatus:
+    count = Paper.query.filter_by(status=status).count()
+    print(f'📋 {status.value.replace(\"_\", \" \").title()}: {count}')
+
+print('=' * 50)
+print(f'📅 Report generated: {datetime.utcnow().strftime(\"%Y-%m-%d %H:%M:%S\")}')
+"
+```
+
+#### Generate Usage Statistics
+```bash
+# Comprehensive usage statistics
+python -c "
+from app import create_app, db
+from app.models import User, Paper, Review, Category
+from sqlalchemy import func
+
+app = create_app()
+app.app_context().push()
+
+print('📈 Paper-CMS Usage Statistics')
+print('=' * 60)
+
+# User statistics
+total_users = User.query.count()
+authors = User.query.filter_by(role='AUTHOR').count()
+reviewers = User.query.filter_by(role='REVIEWER').count()
+admins = User.query.filter_by(role='ADMIN').count()
+
+print(f'👥 Total Users: {total_users}')
+print(f'   ✍️  Authors: {authors} ({authors/total_users*100:.1f}%)')
+print(f'   👁️  Reviewers: {reviewers} ({reviewers/total_users*100:.1f}%)')
+print(f'   🛡️  Admins: {admins} ({admins/total_users*100:.1f}%)')
+print()
+
+# Paper statistics
+total_papers = Paper.query.count()
+if total_papers > 0:
+    avg_reviews = db.session.query(func.avg(func.count(Review.id))).select_from(Review).group_by(Review.paper_id).scalar()
+    print(f'📄 Total Papers: {total_papers}')
+    print(f'   📊 Average Reviews per Paper: {avg_reviews:.1f}' if avg_reviews else '   📊 Average Reviews per Paper: 0')
+    
+    # Most popular conference
+    popular_conf = db.session.query(Paper.conference_name, func.count(Paper.id)).group_by(Paper.conference_name).order_by(func.count(Paper.id).desc()).first()
+    if popular_conf:
+        print(f'   🎯 Most Popular Conference: {popular_conf[0]} ({popular_conf[1]} papers)')
+
+# Category usage
+print()
+print('📁 Category Usage:')
+categories = db.session.query(Category.name, func.count(Paper.id)).outerjoin(Paper.categories).group_by(Category.id).all()
+for cat_name, paper_count in categories:
+    print(f'   📂 {cat_name}: {paper_count} papers')
+
+print('=' * 60)
+"
+```
+
 ## 🚀 Deployment
 
 ### Production Deployment

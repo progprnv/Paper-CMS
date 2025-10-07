@@ -73,15 +73,19 @@
                         <!-- Conference and Categories Row -->
                         <div class="row mb-4">
                             <div class="col-md-6">
-                                {{ form.conference_id.label(class="form-label fw-semibold") }}
-                                {{ form.conference_id(class="form-select" + (" is-invalid" if form.conference_id.errors else "")) }}
-                                {% if form.conference_id.errors %}
+                                {{ form.conference_name.label(class="form-label fw-semibold") }}
+                                {{ form.conference_name(class="form-control" + (" is-invalid" if form.conference_name.errors else ""), placeholder="Enter conference name (e.g., ICML 2025)") }}
+                                {% if form.conference_name.errors %}
                                     <div class="invalid-feedback">
-                                        {% for error in form.conference_id.errors %}
+                                        {% for error in form.conference_name.errors %}
                                             {{ error }}
                                         {% endfor %}
                                     </div>
                                 {% endif %}
+                                <div class="form-text">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Enter the name of the conference or venue where you want to submit
+                                </div>
                             </div>
                             
                             <div class="col-md-6">

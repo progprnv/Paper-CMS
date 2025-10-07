@@ -85,7 +85,7 @@ class Paper(db.Model):
     status = db.Column(db.Enum(PaperStatus), nullable=False, default=PaperStatus.SUBMITTED)
     submission_date = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     file_path = db.Column(db.String(500))
-    conference_id = db.Column(db.Integer, db.ForeignKey('conferences.id'), nullable=False)
+    conference_name = db.Column(db.String(200), nullable=False)
     
     # Metadata
     keywords = db.Column(db.String(500))
@@ -93,7 +93,6 @@ class Paper(db.Model):
     last_updated = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Relationships
-    conference = db.relationship('Conference', backref='papers')
     reviews = db.relationship('Review', backref='paper', lazy='dynamic', cascade='all, delete-orphan')
     categories = db.relationship('Category', secondary=paper_categories, backref='papers')
     submitter = db.relationship('User', foreign_keys=[submitted_by])
@@ -192,6 +191,6 @@ class Affiliation(db.Model):
 # Indexes for better performance
 db.Index('idx_users_email', User.email)
 db.Index('idx_papers_status', Paper.status)
-db.Index('idx_papers_conference', Paper.conference_id)
+db.Index('idx_papers_conference', Paper.conference_name)
 db.Index('idx_reviews_paper', Review.paper_id)
 db.Index('idx_reviews_reviewer', Review.reviewer_id)

@@ -48,7 +48,7 @@ class PaperSubmissionForm(FlaskForm):
         Length(min=100, max=5000, message='Abstract must be between 100-5000 characters')
     ])
     keywords = StringField('Keywords (comma-separated)', validators=[Length(max=500)])
-    conference_id = SelectField('Conference', coerce=int, validators=[DataRequired()])
+    conference_name = StringField('Conference Name', validators=[DataRequired(), Length(min=2, max=200)])
     categories = MultiCheckboxField('Categories', coerce=int)
     file = FileField('Paper File', validators=[
         FileRequired(),
@@ -58,7 +58,6 @@ class PaperSubmissionForm(FlaskForm):
     
     def __init__(self, *args, **kwargs):
         super(PaperSubmissionForm, self).__init__(*args, **kwargs)
-        self.conference_id.choices = [(c.id, f"{c.name} {c.year}") for c in Conference.query.filter_by(status='ACTIVE').all()]
         self.categories.choices = [(c.id, c.name) for c in Category.query.all()]
 
 class ReviewForm(FlaskForm):

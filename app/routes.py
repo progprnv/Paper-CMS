@@ -101,8 +101,7 @@ def submit_paper():
         # Save uploaded file
         file_path = None
         if form.file.data:
-            conference = Conference.query.get(form.conference_id.data)
-            folder_path = f"papers/{conference.year}/{conference.name.replace(' ', '_')}"
+            folder_path = f"papers/{form.conference_name.data.replace(' ', '_')}"
             file_path = save_file(form.file.data, folder_path)
         
         # Create paper
@@ -110,7 +109,7 @@ def submit_paper():
             title=form.title.data,
             abstract=form.abstract.data,
             keywords=form.keywords.data,
-            conference_id=form.conference_id.data,
+            conference_name=form.conference_name.data,
             file_path=file_path,
             submitted_by=current_user.id,
             status=PaperStatus.SUBMITTED
