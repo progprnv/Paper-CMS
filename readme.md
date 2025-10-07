@@ -1,14 +1,320 @@
-# 📚 Paper-CMS - Research Paper Management System
+# 📚 Paper-CMS - Academic Paper Management System
 
-![Paper-CMS Banner](https://img.shields.io/badge/Paper-CMS-blue?style=for-the-badge&logo=academia&logoColor=white)
+![Paper-CMS Banner](https://img.shields.io/badge/Paper-CMS-black?style=for-the-badge&logo=academia&logoColor=white)
 
 [![Python](https://img.shields.io/badge/Python-3.8+-blue?style=flat&logo=python)](https://python.org)
 [![Flask](https://img.shields.io/badge/Flask-2.3+-green?style=flat&logo=flask)](https://flask.palletsprojects.com)
-[![MySQL](https://img.shields.io/badge/MySQL-8.0+-orange?style=flat&logo=mysql)](https://mysql.com)
+[![SQLite](https://img.shields.io/badge/SQLite-3.0+-orange?style=flat&logo=sqlite)](https://sqlite.org)
 [![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-purple?style=flat&logo=bootstrap)](https://getbootstrap.com)
 [![License](https://img.shields.io/badge/License-MIT-yellow?style=flat)](LICENSE)
 
-A comprehensive Flask-based Research Paper Repository & Publication Management System that handles the complete academic workflow from paper submission through peer review to final decision.
+A clean, modern Flask-based Academic Paper Management System with a focus on simplicity and usability. Features a professional black & white design for maximum readability and accessibility.
+
+## 🌟 Features
+
+### 🎯 Core Features
+- **Paper Submission**: Clean upload interface with drag & drop support
+- **Peer Review System**: Streamlined review assignment and tracking
+- **User Management**: Role-based access (Authors, Reviewers, Administrators)
+- **Dashboard**: Clean statistics and paper management interface
+- **Search & Filter**: Find papers quickly with advanced search
+
+### 🎨 Design Highlights
+- **Black & White Theme**: Maximum readability and accessibility
+- **Clean Interface**: Professional academic appearance
+- **Responsive Design**: Works perfectly on all devices
+- **Fast Performance**: Optimized for speed and usability
+
+### 🔐 Security
+- Secure user authentication with Flask-Login
+- Password hashing with Werkzeug security
+- Role-based access control
+- File upload validation and security
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Python 3.8 or higher
+- Git
+
+### Installation
+
+1. **Clone the repository**
+```bash
+git clone https://github.com/progprnv/Paper-CMS.git
+cd Paper-CMS
+```
+
+2. **Create virtual environment**
+```bash
+python -m venv venv
+
+# Windows
+venv\Scripts\activate
+
+# macOS/Linux
+source venv/bin/activate
+```
+
+3. **Install dependencies**
+```bash
+pip install -r requirements.txt
+```
+
+4. **Initialize database**
+```bash
+python -c "from app import create_app, db; app = create_app(); app.app_context().push(); db.create_all()"
+```
+
+5. **Create admin user**
+```bash
+python -c "from app import create_app, db; from app.models import User, UserRole; from werkzeug.security import generate_password_hash; app = create_app(); app.app_context().push(); admin = User(name='Administrator', email='admin@paper-cms.com', role=UserRole.ADMIN, password_hash=generate_password_hash('admin123')); db.session.add(admin); db.session.commit(); print('Admin user created!')"
+```
+
+6. **Run the application**
+```bash
+python run.py
+```
+
+Visit `http://localhost:5000` to access Paper-CMS
+
+### Default Admin Login
+- **Email**: `admin@paper-cms.com`
+- **Password**: `admin123`
+
+## 📁 Project Structure
+
+```
+Paper-CMS/
+├── app/
+│   ├── __init__.py           # Flask app factory
+│   ├── models.py             # Database models
+│   ├── auth.py               # Authentication routes
+│   ├── routes.py             # Main application routes
+│   ├── admin.py              # Admin panel routes
+│   ├── forms.py              # WTForms definitions
+│   ├── utils.py              # Utility functions
+│   ├── static/
+│   │   ├── css/
+│   │   │   └── custom.css    # Clean black & white styling
+│   │   ├── js/
+│   │   │   └── main.js       # Interactive functionality
+│   │   └── uploads/          # File upload directory
+│   └── templates/
+│       ├── base.html         # Base template
+│       ├── index.html        # Homepage
+│       ├── auth/             # Authentication templates
+│       ├── dashboard/        # Dashboard templates
+│       ├── papers/           # Paper management templates
+│       └── admin/            # Admin panel templates
+├── instance/
+│   └── paperflow_cms_dev.db # SQLite database
+├── config.py                 # Configuration settings
+├── run.py                    # Application entry point
+├── requirements.txt          # Python dependencies
+├── schema.sql               # Database schema
+└── README.md                # This file
+```
+
+## 🎨 Design System
+
+### Color Palette
+- **Primary**: Black (`#000000`)
+- **Background**: White (`#ffffff`)
+- **Light Gray**: (`#f5f5f5`)
+- **Text**: Black (`#000000`)
+- **Borders**: Black (`#000000`)
+
+### Typography
+- **Primary Font**: Inter (system fallback)
+- **Clean, readable design** for academic content
+- **Proper contrast ratios** for accessibility
+
+### Components
+- **Cards**: White background with black borders
+- **Buttons**: Black/white with hover inversions
+- **Tables**: Clean data presentation
+- **Forms**: Clear input styling
+- **Navigation**: Simple and intuitive
+
+## 🔧 Configuration
+
+### Environment Variables
+Create a `.env` file for custom configuration:
+
+```env
+SECRET_KEY=your-secret-key-here
+DATABASE_URL=sqlite:///instance/paperflow_cms.db
+UPLOAD_FOLDER=app/static/uploads
+MAX_CONTENT_LENGTH=16777216  # 16MB
+```
+
+### Database Configuration
+The system uses SQLite by default for simplicity. For production, you can configure PostgreSQL or MySQL:
+
+```python
+# config.py
+SQLALCHEMY_DATABASE_URI = 'postgresql://user:pass@localhost/paper_cms'
+# or
+SQLALCHEMY_DATABASE_URI = 'mysql://user:pass@localhost/paper_cms'
+```
+
+## 👥 User Roles
+
+### Authors
+- Submit papers for review
+- Track submission status
+- View review feedback
+- Manage profile and papers
+
+### Reviewers
+- Review assigned papers
+- Submit detailed evaluations
+- Track review history
+- Manage availability
+
+### Administrators
+- Manage all users and papers
+- Assign reviewers to papers
+- View system analytics
+- Configure system settings
+
+## 📊 Features in Detail
+
+### Paper Submission
+- **File Upload**: Drag & drop interface with validation
+- **Metadata**: Title, abstract, keywords, authors
+- **Categories**: Organize papers by subject area
+- **Status Tracking**: Real-time submission status
+
+### Review System
+- **Assignment**: Manual or automatic reviewer assignment
+- **Scoring**: Detailed evaluation criteria
+- **Comments**: Confidential reviewer feedback
+- **Deadlines**: Review timeline management
+
+### Admin Dashboard
+- **Statistics**: Submission and review metrics
+- **User Management**: Add, edit, and manage users
+- **Paper Management**: Overview of all submissions
+- **System Settings**: Configure application behavior
+
+## 🛠️ Development
+
+### Adding New Features
+
+1. **Models**: Add to `app/models.py`
+2. **Forms**: Create in `app/forms.py`
+3. **Routes**: Add to appropriate route file
+4. **Templates**: Create in `app/templates/`
+5. **Styling**: Update `app/static/css/custom.css`
+
+### Database Migrations
+
+```bash
+# Create migration
+flask db migrate -m "Description of changes"
+
+# Apply migration
+flask db upgrade
+```
+
+### Testing
+
+```bash
+# Run tests (when implemented)
+python -m pytest tests/
+
+# Coverage report
+coverage run -m pytest
+coverage report
+```
+
+## 🚀 Deployment
+
+### Production Deployment
+
+1. **Configure production settings**
+```python
+# config.py
+class ProductionConfig(Config):
+    DEBUG = False
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
+```
+
+2. **Use production server**
+```bash
+pip install gunicorn
+gunicorn -w 4 -b 0.0.0.0:5000 run:app
+```
+
+3. **Set up reverse proxy** (nginx recommended)
+
+### Docker Deployment
+
+```dockerfile
+FROM python:3.9-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY . .
+EXPOSE 5000
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "run:app"]
+```
+
+## 📈 Roadmap
+
+### Current Features ✅
+- User authentication and roles
+- Paper submission and management
+- Basic review system
+- Admin dashboard
+- Clean black & white design
+
+### Planned Features 🚧
+- Email notifications
+- Advanced search filters
+- Bulk operations
+- API endpoints
+- Mobile app
+
+### Future Enhancements 🔮
+- Integration with academic databases
+- Advanced analytics
+- Multi-language support
+- AI-powered features
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/new-feature`
+3. Make your changes
+4. Add tests if applicable
+5. Commit: `git commit -m 'Add new feature'`
+6. Push: `git push origin feature/new-feature`
+7. Submit a Pull Request
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- Flask community for the excellent framework
+- Bootstrap for responsive design components
+- Academic community for requirements and feedback
+
+## 📞 Support
+
+- **Issues**: [GitHub Issues](https://github.com/progprnv/Paper-CMS/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/progprnv/Paper-CMS/discussions)
+
+---
+
+<div align="center">
+  <p>Made with ❤️ for the academic community</p>
+  <p><strong>Clean • Simple • Professional</strong></p>
+</div>
 
 ## 🌟 Features Overview
 
