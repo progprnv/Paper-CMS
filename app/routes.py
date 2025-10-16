@@ -22,7 +22,9 @@ def health_check():
         return {
             'status': 'ok',
             'message': 'Paper-CMS is running',
-            'config': current_app.config.get('FLASK_CONFIG', 'unknown')
+            'config': current_app.config.get('FLASK_CONFIG', 'unknown'),
+            'has_db_env': 'DATABASE_URL' in os.environ,
+            'vercel_env': 'VERCEL' in os.environ
         }, 200
     except Exception as e:
         return {'status': 'error', 'message': str(e)}, 500
@@ -32,17 +34,26 @@ def test_db():
     """Test database connection"""
     try:
         from app.models import User
+        # Show the database URL being used (without password)
+        db_url = current_app.config.get('SQLALCHEMY_DATABASE_URI', 'Not set')
+        # Hide password for security
+        safe_db_url = db_url.split('@')[1] if '@' in db_url else 'Invalid URL format'
+        
         # Try to query the database
         user_count = User.query.count()
         return {
             'status': 'ok', 
             'message': 'Database connection successful',
-            'user_count': user_count
+            'user_count': user_count,
+            'db_host': safe_db_url
         }, 200
     except Exception as e:
+        db_url = current_app.config.get('SQLALCHEMY_DATABASE_URI', 'Not set')
+        safe_db_url = db_url.split('@')[1] if '@' in db_url else 'Invalid URL format'
         return {
             'status': 'error', 
-            'message': f'Database error: {str(e)}'
+            'message': f'Database error: {str(e)}',
+            'db_host': safe_db_url
         }, 500
 
 @main.route('/init-db')

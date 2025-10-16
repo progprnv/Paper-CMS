@@ -6,8 +6,9 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'paper-cms-super-secret-key-2025-change-this'
     
     # Your Supabase PostgreSQL configuration
+    # URL-encoded password: Admin@123#Admin becomes Admin%40123%23Admin
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        'postgresql://postgres:Admin@123#Admin@db.xssqhifnabymmsvvybgx.supabase.co:5432/postgres'
+        'postgresql://postgres:Admin%40123%23Admin@db.xssqhifnabymmsvvybgx.supabase.co:5432/postgres'
     
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ENGINE_OPTIONS = {
