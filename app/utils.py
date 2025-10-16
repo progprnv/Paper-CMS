@@ -41,28 +41,125 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in current_app.config['ALLOWED_EXTENSIONS']
 
 def save_file(file, folder_path):
-    """Save uploaded file securely"""
+    """Save uploaded file using Supabase Storage or local storage"""
     if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        # Add timestamp to prevent conflicts
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S_')
-        filename = timestamp + filename
-        
-        # Create folder if it doesn't exist
-        full_folder_path = os.path.join(current_app.config['UPLOAD_FOLDER'], folder_path)
-        os.makedirs(full_folder_path, exist_ok=True)
-        
-        # Save file
-        file_path = os.path.join(full_folder_path, filename)
-        file.save(file_path)
-        
-        # Return relative path for database storage
-        return os.path.join(folder_path, filename).replace('\\', '/')
+        try:
+            # Import here to avoid circular imports
+            from app.supabase_utils import supabase_client
+            
+            # Add timestamp to prevent conflicts
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S_')
+            original_filename = secure_filename(file.filename)
+            filename = timestamp + original_filename
+            
+            # Create a new file object with the updated filename
+            file.filename = filename
+            
+            # Upload to Supabase Storage
+            file_url = supabase_client.upload_file(file, folder_path)
+            
+            if file_url:
+                # Return the file URL or path for database storage
+                return file_url
+            else:
+                current_app.logger.error("Failed to upload file")
+                return None
+                
+        except Exception as e:
+            current_app.logger.error(f"Error saving file: {e}")
+            return None
     return None
 
 def get_file_path(relative_path):
-    """Get absolute file path from relative path"""
-    return os.path.join(current_app.config['UPLOAD_FOLDER'], relative_path)
+    """Get file URL from Supabase or absolute path for local files"""
+    try:
+        from app.supabase_utils import supabase_client
+        
+        # If it's already a URL, return as is
+        if relative_path.startswith('http'):
+            return relative_path
+        
+        # Try to get URL from Supabase
+        return supabase_client.get_file_url(relative_path)
+    except:
+        # Fallback to local file path
+        if not relative_path.startswith('http'):
+            return os.path.join(current_app.config['UPLOAD_FOLDER'], relative_path)
+        return relative_path
+
+def delete_file(file_path):
+    """Delete file from Supabase Storage or local storage"""
+    try:
+        from app.supabase_utils import supabase_client
+        return supabase_client.delete_file(file_path)
+    except Exception as e:
+        current_app.logger.error(f"Error deleting file: {e}")
+        return False
+
+def format_datetime(value, format='%Y-%m-%d %H:%M'):
+    """Format datetime for display"""
+    if value is None:
+        return ""
+    return value.strftime(format)
+
+def get_status_badge_class(status):
+    """Get Bootstrap badge class for paper status"""
+    status_classes = {
+        'SUBMITTED': 'badge-primary',
+        'UNDER_REVIEW': 'badge-warning',
+        'REVIEWED': 'badge-info',
+        'ACCEPTED': 'badge-success',
+        'REJECTED': 'badge-danger',
+        'REVISION_REQUIRED': 'badge-secondary'
+    }
+    return status_classes.get(status, 'badge-secondary')
+
+def get_role_badge_class(role):
+    """Get Bootstrap badge class for user role"""
+    role_classes = {
+        'AUTHOR': 'badge-primary',
+        'REVIEWER': 'badge-info',
+        'ADMIN': 'badge-danger'
+    }
+    return role_classes.get(role, 'badge-secondary')
+
+def calculate_days_until(target_date):
+    """Calculate days until target date"""
+    if not target_date:
+        return None
+    
+    today = datetime.now().date()
+    target = target_date.date() if hasattr(target_date, 'date') else target_date
+    delta = target - today
+    return delta.days
+
+def is_deadline_approaching(target_date, days_threshold=7):
+    """Check if deadline is approaching within threshold"""
+    days_until = calculate_days_until(target_date)
+    return days_until is not None and 0 <= days_until <= days_threshold
+
+def paginate_query(query, page, per_page=10):
+    """Paginate SQLAlchemy query"""
+    return query.paginate(
+        page=page,
+        per_page=per_page,
+        error_out=False
+    )
+
+def generate_filename(original_filename, prefix=''):
+    """Generate unique filename"""
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    random_str = secrets.token_hex(8)
+    name, ext = os.path.splitext(secure_filename(original_filename))
+    return f"{prefix}{timestamp}_{random_str}{ext}"
+
+# Template filters
+def register_template_filters(app):
+    """Register custom template filters"""
+    app.jinja_env.filters['datetime'] = format_datetime
+    app.jinja_env.filters['status_badge'] = get_status_badge_class
+    app.jinja_env.filters['role_badge'] = get_role_badge_class
+    app.jinja_env.filters['days_until'] = calculate_days_until
 
 def format_datetime(value, format='%Y-%m-%d %H:%M'):
     """Format datetime for display"""

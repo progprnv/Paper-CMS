@@ -18,6 +18,9 @@ def create_app(config_name=None):
     
     # Load configuration
     config_name = config_name or os.getenv('FLASK_CONFIG', 'default')
+    if os.getenv('VERCEL'):
+        config_name = 'vercel'
+    
     app.config.from_object(config[config_name])
     
     # Initialize extensions
@@ -25,6 +28,10 @@ def create_app(config_name=None):
     login_manager.init_app(app)
     mail.init_app(app)
     limiter.init_app(app)
+    
+    # Initialize Supabase
+    from app.supabase_utils import supabase_client
+    supabase_client.init_app(app)
     
     # Configure Flask-Login
     login_manager.login_view = 'auth.login'
@@ -46,10 +53,13 @@ def create_app(config_name=None):
         app.register_blueprint(auth, url_prefix='/auth')
         app.register_blueprint(admin, url_prefix='/admin')
     
-    # Create upload directory
-    upload_dir = app.config['UPLOAD_FOLDER']
-    if not os.path.exists(upload_dir):
-        os.makedirs(upload_dir)
+    # Create upload directory (for local development)
+    upload_dir = app.config.get('UPLOAD_FOLDER')
+    if upload_dir and not os.path.exists(upload_dir):
+        try:
+            os.makedirs(upload_dir, exist_ok=True)
+        except Exception as e:
+            app.logger.warning(f"Could not create upload directory: {e}")
     
     # Register template filters
     from app.utils import register_template_filters

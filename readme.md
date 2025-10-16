@@ -855,34 +855,245 @@ print('=' * 60)
 
 ## 🚀 Deployment
 
-### Production Deployment
+### Supabase + Vercel Deployment
 
-1. **Configure production settings**
-```python
-# config.py
-class ProductionConfig(Config):
-    DEBUG = False
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
+Paper-CMS is optimized for deployment on **Vercel** with **Supabase** as the database and storage backend.
+
+#### Prerequisites
+- [Vercel Account](https://vercel.com)
+- [Supabase Account](https://supabase.com)
+- [Node.js](https://nodejs.org) (for CLI tools)
+- [Git](https://git-scm.com)
+
+#### Step 1: Setup Supabase
+
+1. **Create Supabase Project**
+```bash
+# Go to https://supabase.com and create a new project
+# Note down your project URL and API keys
 ```
 
-2. **Use production server**
+2. **Setup Database**
 ```bash
+# Run the SQL setup in Supabase SQL Editor
+# Copy and paste the contents of supabase_setup.sql
+```
+
+3. **Create Storage Bucket**
+```bash
+# In Supabase Dashboard:
+# 1. Go to Storage
+# 2. Create a new bucket named 'papers'
+# 3. Set appropriate policies for file access
+```
+
+4. **Get Connection Details**
+```bash
+# From Supabase Dashboard > Settings > API:
+# - Project URL
+# - Anon/Public key  
+# - Service Role key
+# - Database URL (Settings > Database)
+```
+
+#### Step 2: Deploy to Vercel
+
+1. **Install Vercel CLI**
+```bash
+npm install -g vercel
+```
+
+2. **Deploy Application**
+```bash
+# In your project directory
+vercel
+
+# Follow the prompts:
+# - Link to existing project or create new
+# - Set build command: (leave default)
+# - Set output directory: (leave default)
+```
+
+3. **Configure Environment Variables**
+```bash
+# In Vercel Dashboard > Project > Settings > Environment Variables
+# Add the following variables:
+
+FLASK_CONFIG=vercel
+SECRET_KEY=your-super-secret-key-here
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+DATABASE_URL=postgresql://postgres:password@db.your-project.supabase.co:5432/postgres
+SUPABASE_STORAGE_BUCKET=papers
+VERCEL=1
+```
+
+4. **Redeploy with Environment Variables**
+```bash
+vercel --prod
+```
+
+#### Step 3: Initialize Database
+
+1. **Create Admin User**
+```bash
+# Using Supabase SQL Editor, run:
+INSERT INTO users (name, email, password_hash, role) VALUES 
+('Administrator', 'admin@paper-cms.com', 'scrypt:32768:8:1$qJ8VWq8IjXlE1O0P$...', 'ADMIN');
+```
+
+2. **Verify Deployment**
+```bash
+# Visit your Vercel URL
+# Login with admin@paper-cms.com / admin123
+```
+
+#### Alternative: Local Development with Supabase
+
+1. **Setup Environment**
+```bash
+# Copy environment template
+cp .env.template .env
+
+# Fill in your Supabase credentials in .env
+```
+
+2. **Install Dependencies**
+```bash
+pip install -r requirements.txt
+```
+
+3. **Initialize Database**
+```bash
+python run.py init_db
+```
+
+4. **Run Application**
+```bash
+python run.py
+```
+
+### Traditional Production Deployment
+
+#### Production Deployment with Gunicorn
+
+```bash
+# Install production server
 pip install gunicorn
+
+# Run with Gunicorn
 gunicorn -w 4 -b 0.0.0.0:5000 run:app
 ```
 
-3. **Set up reverse proxy** (nginx recommended)
-
-### Docker Deployment
+#### Docker Deployment
 
 ```dockerfile
-FROM python:3.9-slim
+# Dockerfile
+FROM python:3.11-slim
+
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install -r requirements.txt
+
 COPY . .
 EXPOSE 5000
+
 CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "run:app"]
+```
+
+#### Docker Compose with Supabase
+
+```yaml
+# docker-compose.yml
+version: '3.8'
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_CONFIG=production
+      - DATABASE_URL=postgresql://postgres:password@db.supabase.co:5432/postgres
+      - SUPABASE_URL=https://your-project.supabase.co
+      - SUPABASE_ANON_KEY=your-anon-key
+      - SECRET_KEY=your-secret-key
+    depends_on:
+      - redis
+  
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+```
+
+### Environment Variables Reference
+
+| Variable | Description | Required | Example |
+|----------|-------------|----------|---------|
+| `FLASK_CONFIG` | Configuration mode | Yes | `production` |
+| `SECRET_KEY` | Flask secret key | Yes | `your-secret-key` |
+| `SUPABASE_URL` | Supabase project URL | Yes | `https://xxx.supabase.co` |
+| `SUPABASE_ANON_KEY` | Supabase anon key | Yes | `eyJhbGciOiJIUzI1NiIs...` |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service key | Yes | `eyJhbGciOiJIUzI1NiIs...` |
+| `DATABASE_URL` | PostgreSQL connection | Yes | `postgresql://postgres:...` |
+| `SUPABASE_STORAGE_BUCKET` | Storage bucket name | No | `papers` (default) |
+| `MAIL_SERVER` | SMTP server | No | `smtp.gmail.com` |
+| `MAIL_USERNAME` | Email username | No | `your-email@gmail.com` |
+| `MAIL_PASSWORD` | Email password | No | `your-app-password` |
+| `REDIS_URL` | Redis connection | No | `redis://localhost:6379` |
+
+### Troubleshooting Deployment
+
+#### Common Issues
+
+1. **Database Connection Error**
+```bash
+# Check DATABASE_URL format
+# Ensure Supabase project is active
+# Verify connection from Supabase dashboard
+```
+
+2. **File Upload Issues**
+```bash
+# Verify storage bucket exists
+# Check bucket policies
+# Ensure SUPABASE_STORAGE_BUCKET is set
+```
+
+3. **Environment Variables**
+```bash
+# Verify all required variables are set
+# Check for typos in variable names
+# Ensure values don't have extra spaces
+```
+
+4. **Vercel Function Timeout**
+```bash
+# Check vercel.json maxDuration setting
+# Optimize database queries
+# Consider using connection pooling
+```
+
+#### Vercel Specific
+
+```bash
+# View deployment logs
+vercel logs
+
+# Check function performance
+vercel inspect
+
+# Force redeploy
+vercel --force
+```
+
+#### Database Performance
+
+```bash
+# Enable connection pooling in Supabase
+# Use indexes for frequently queried columns
+# Monitor query performance in Supabase dashboard
 ```
 
 ## 📈 Roadmap
