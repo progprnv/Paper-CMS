@@ -62,18 +62,33 @@ def debug_config():
     try:
         from urllib.parse import quote_plus
         
-        # Show how the URL is constructed
+        # Test URL construction
         db_password = 'Admin@123#Admin'
         encoded_password = quote_plus(db_password)
+        test_url = f'postgresql://postgres:{encoded_password}@db.xssqhifnabymmsvvybgx.supabase.co:5432/postgres'
         
         db_url = current_app.config.get('SQLALCHEMY_DATABASE_URI', 'Not set')
         
+        # Parse the actual URL being used
+        if '@' in db_url:
+            parts = db_url.split('@')
+            if len(parts) >= 2:
+                auth_part = parts[0]  # postgresql://postgres:password
+                host_part = parts[1]  # host:port/db
+                actual_host = host_part.split(':')[0] if ':' in host_part else host_part.split('/')[0]
+            else:
+                actual_host = 'Parse failed'
+        else:
+            actual_host = 'No @ found in URL'
+        
         return {
             'status': 'ok',
+            'original_password': db_password,
             'encoded_password': encoded_password,
-            'db_url_format': 'postgresql://postgres:[PASSWORD]@db.xssqhifnabymmsvvybgx.supabase.co:5432/postgres',
+            'test_constructed_url': test_url,
+            'actual_db_url_host': actual_host,
             'has_env_db_url': 'DATABASE_URL' in os.environ,
-            'actual_host': db_url.split('@')[1].split(':')[0] if '@' in db_url else 'Parse failed'
+            'env_db_url': os.environ.get('DATABASE_URL', 'Not set')[:50] + '...' if os.environ.get('DATABASE_URL') else 'Not set'
         }, 200
     except Exception as e:
         return {'status': 'error', 'message': str(e)}, 500

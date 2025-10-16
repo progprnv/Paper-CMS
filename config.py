@@ -8,17 +8,26 @@ class Config:
     
     # Your Supabase PostgreSQL configuration
     # Construct database URL with proper encoding
-    DB_HOST = 'db.xssqhifnabymmsvvybgx.supabase.co'
-    DB_USER = 'postgres'
-    DB_PASSWORD = 'Admin@123#Admin'
-    DB_NAME = 'postgres'
-    DB_PORT = '5432'
+    @staticmethod
+    def get_database_url():
+        """Construct database URL with proper password encoding"""
+        # Check if DATABASE_URL is set in environment first
+        if os.environ.get('DATABASE_URL'):
+            return os.environ.get('DATABASE_URL')
+        
+        # Fallback to constructing URL
+        db_host = 'db.xssqhifnabymmsvvybgx.supabase.co'
+        db_user = 'postgres'
+        db_password = 'Admin@123#Admin'
+        db_name = 'postgres'
+        db_port = '5432'
+        
+        # URL-encode the password properly
+        encoded_password = quote_plus(db_password)
+        
+        return f'postgresql://{db_user}:{encoded_password}@{db_host}:{db_port}/{db_name}'
     
-    # URL-encode the password properly
-    ENCODED_PASSWORD = quote_plus(DB_PASSWORD)
-    
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        f'postgresql://{DB_USER}:{ENCODED_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
+    SQLALCHEMY_DATABASE_URI = get_database_url()
     
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ENGINE_OPTIONS = {
