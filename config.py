@@ -1,14 +1,24 @@
 import os
 from datetime import timedelta
+from urllib.parse import quote_plus
 
 class Config:
     """Base configuration class"""
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'paper-cms-super-secret-key-2025-change-this'
     
     # Your Supabase PostgreSQL configuration
-    # URL-encoded password: Admin@123#Admin becomes Admin%40123%23Admin
+    # Construct database URL with proper encoding
+    DB_HOST = 'db.xssqhifnabymmsvvybgx.supabase.co'
+    DB_USER = 'postgres'
+    DB_PASSWORD = 'Admin@123#Admin'
+    DB_NAME = 'postgres'
+    DB_PORT = '5432'
+    
+    # URL-encode the password properly
+    ENCODED_PASSWORD = quote_plus(DB_PASSWORD)
+    
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        'postgresql://postgres:Admin%40123%23Admin@db.xssqhifnabymmsvvybgx.supabase.co:5432/postgres'
+        f'postgresql://{DB_USER}:{ENCODED_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
     
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ENGINE_OPTIONS = {

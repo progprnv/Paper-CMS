@@ -56,6 +56,28 @@ def test_db():
             'db_host': safe_db_url
         }, 500
 
+@main.route('/debug-config')
+def debug_config():
+    """Debug configuration - REMOVE IN PRODUCTION"""
+    try:
+        from urllib.parse import quote_plus
+        
+        # Show how the URL is constructed
+        db_password = 'Admin@123#Admin'
+        encoded_password = quote_plus(db_password)
+        
+        db_url = current_app.config.get('SQLALCHEMY_DATABASE_URI', 'Not set')
+        
+        return {
+            'status': 'ok',
+            'encoded_password': encoded_password,
+            'db_url_format': 'postgresql://postgres:[PASSWORD]@db.xssqhifnabymmsvvybgx.supabase.co:5432/postgres',
+            'has_env_db_url': 'DATABASE_URL' in os.environ,
+            'actual_host': db_url.split('@')[1].split(':')[0] if '@' in db_url else 'Parse failed'
+        }, 200
+    except Exception as e:
+        return {'status': 'error', 'message': str(e)}, 500
+
 @main.route('/init-db')
 def init_db():
     """Initialize database tables - USE ONLY ONCE"""
