@@ -12,26 +12,49 @@ main = Blueprint('main', __name__)
 
 @main.route('/favicon.ico')
 def favicon():
-    """Serve favicon"""
-    return '', 204  # Return empty response with No Content status
+    """Serve a simple emoji favicon"""
+    return '📄', 200, {'Content-Type': 'text/plain; charset=utf-8'}
+
+@main.route('/health')
+def health_check():
+    """Simple health check endpoint"""
+    try:
+        return {
+            'status': 'ok',
+            'message': 'Paper-CMS is running',
+            'config': current_app.config.get('FLASK_CONFIG', 'unknown')
+        }, 200
+    except Exception as e:
+        return {'status': 'error', 'message': str(e)}, 500
 
 @main.route('/')
 def index():
     """Homepage"""
-    # Get statistics
-    total_papers = Paper.query.count()
-    total_users = User.query.count()
-    active_conferences = Conference.query.filter_by(status='ACTIVE').count()
-    
-    # Recent papers
-    recent_papers = Paper.query.order_by(Paper.submission_date.desc()).limit(5).all()
-    
-    return render_template('index.html', 
-                         title='PaperFlow CMS - Academic Paper Management',
-                         total_papers=total_papers,
-                         total_users=total_users,
-                         active_conferences=active_conferences,
-                         recent_papers=recent_papers)
+    try:
+        # Get statistics - with error handling for database issues
+        total_papers = 0
+        total_users = 0
+        active_conferences = 0
+        recent_papers = []
+        
+        try:
+            total_papers = Paper.query.count()
+            total_users = User.query.count()
+            active_conferences = Conference.query.filter_by(status='ACTIVE').count()
+            recent_papers = Paper.query.order_by(Paper.submission_date.desc()).limit(5).all()
+        except Exception as db_error:
+            current_app.logger.warning(f'Database query failed: {db_error}')
+            # Continue with default values
+        
+        return render_template('index.html', 
+                             title='PaperFlow CMS - Academic Paper Management',
+                             total_papers=total_papers,
+                             total_users=total_users,
+                             active_conferences=active_conferences,
+                             recent_papers=recent_papers)
+    except Exception as e:
+        current_app.logger.error(f'Index route error: {e}')
+        return f'Error loading page: {str(e)}', 500
 
 @main.route('/dashboard')
 @login_required
