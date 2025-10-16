@@ -27,6 +27,44 @@ def health_check():
     except Exception as e:
         return {'status': 'error', 'message': str(e)}, 500
 
+@main.route('/test-db')
+def test_db():
+    """Test database connection"""
+    try:
+        from app.models import User
+        # Try to query the database
+        user_count = User.query.count()
+        return {
+            'status': 'ok', 
+            'message': 'Database connection successful',
+            'user_count': user_count
+        }, 200
+    except Exception as e:
+        return {
+            'status': 'error', 
+            'message': f'Database error: {str(e)}'
+        }, 500
+
+@main.route('/init-db')
+def init_db():
+    """Initialize database tables - USE ONLY ONCE"""
+    try:
+        # Import all models to ensure they're registered
+        from app.models import User, Paper, Review, Conference, Category, Affiliation
+        
+        # Create all tables
+        db.create_all()
+        
+        return {
+            'status': 'ok',
+            'message': 'Database tables created successfully'
+        }, 200
+    except Exception as e:
+        return {
+            'status': 'error',
+            'message': f'Database initialization error: {str(e)}'
+        }, 500
+
 @main.route('/')
 def index():
     """Homepage"""

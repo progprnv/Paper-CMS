@@ -49,30 +49,37 @@ def register():
     
     form = RegistrationForm()
     if form.validate_on_submit():
-        user = User(
-            name=form.name.data,
-            email=form.email.data,
-            role=UserRole[form.role.data]
-        )
-        user.set_password(form.password.data)
-        
-        db.session.add(user)
-        db.session.commit()
-        
-        flash('Registration successful! You can now log in.', 'success')
-        
-        # Send welcome email
         try:
-            send_email(
-                user.email,
-                'Welcome to PaperFlow CMS',
-                'auth/email/welcome',
-                user=user
+            user = User(
+                name=form.name.data,
+                email=form.email.data,
+                role=UserRole[form.role.data]
             )
+            user.set_password(form.password.data)
+            
+            db.session.add(user)
+            db.session.commit()
+            
+            flash('Registration successful! You can now log in.', 'success')
+            
+            # Send welcome email
+            try:
+                send_email(
+                    user.email,
+                    'Welcome to PaperFlow CMS',
+                    'auth/email/welcome',
+                    user=user
+                )
+            except Exception as e:
+                current_app.logger.error(f"Failed to send welcome email: {e}")
+            
+            return redirect(url_for('auth.login'))
+            
         except Exception as e:
-            current_app.logger.error(f"Failed to send welcome email: {e}")
-        
-        return redirect(url_for('auth.login'))
+            current_app.logger.error(f"Registration error: {e}")
+            db.session.rollback()
+            flash(f'Registration failed: {str(e)}', 'error')
+            return render_template('auth/register.html', title='Register', form=form)
     
     return render_template('auth/register.html', title='Register', form=form)
 
