@@ -168,9 +168,22 @@ body {
 
 .btn-primary:hover {
     background: #ffffff;
-    color: #000000;
+    color: #000000 !important;
     border-color: #000000;
     transform: translateY(-1px);
+}
+
+/* Specific fix for Get Started button and all primary buttons */
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active,
+a.btn-primary:hover,
+a.btn-primary:focus,
+a.btn-primary:active {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border-color: #000000 !important;
+    text-decoration: none !important;
 }
 
 .btn-secondary {
@@ -212,6 +225,21 @@ body {
 .hero .btn-outline-primary:hover {
     background: #000000 !important;
     color: #ffffff !important;
+    border: 2px solid #000000 !important;
+}
+
+/* Fix for primary buttons in hero section */
+.hero .btn-primary {
+    background: #000000 !important;
+    color: #ffffff !important;
+    border: 2px solid #000000 !important;
+}
+
+.hero .btn-primary:hover,
+.hero .btn-primary:focus,
+.hero .btn-primary:active {
+    background: #ffffff !important;
+    color: #000000 !important;
     border: 2px solid #000000 !important;
 }
 
