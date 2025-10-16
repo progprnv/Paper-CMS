@@ -29,9 +29,12 @@ def create_app(config_name=None):
     mail.init_app(app)
     limiter.init_app(app)
     
-    # Initialize Supabase
-    from app.supabase_utils import supabase_client
-    supabase_client.init_app(app)
+    # Initialize Supabase (with fallback)
+    try:
+        from app.supabase_utils import supabase_client
+        supabase_client.init_app(app)
+    except Exception as e:
+        app.logger.warning(f'Supabase initialization failed: {e}. Continuing without Supabase integration.')
     
     # Configure Flask-Login
     login_manager.login_view = 'auth.login'

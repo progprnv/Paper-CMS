@@ -17,12 +17,16 @@ class SupabaseClient:
     def init_app(self, app):
         """Initialize Supabase client with Flask app"""
         supabase_url = app.config.get('SUPABASE_URL')
-        supabase_key = app.config.get('SUPABASE_KEY')
+        supabase_key = app.config.get('SUPABASE_KEY') or app.config.get('SUPABASE_ANON_KEY')
         
         if supabase_url and supabase_key:
-            self.client = create_client(supabase_url, supabase_key)
-            self.storage_bucket = app.config.get('SUPABASE_STORAGE_BUCKET', 'papers')
-            app.logger.info('Supabase client initialized successfully')
+            try:
+                self.client = create_client(supabase_url, supabase_key)
+                self.storage_bucket = app.config.get('SUPABASE_STORAGE_BUCKET', 'papers')
+                app.logger.info('Supabase client initialized successfully')
+            except Exception as e:
+                app.logger.warning(f'Failed to initialize Supabase client: {e}. Using local storage.')
+                self.client = None
         else:
             app.logger.warning('Supabase credentials not found, using local storage')
     
