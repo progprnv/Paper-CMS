@@ -1725,13 +1725,6 @@ We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.
 - Bulk operations on large datasets may timeout
 - Mobile interface needs touch optimization
 
-## 📞 Support & Contact
-
-- **Documentation**: [Full Documentation](https://paperflow-cms.readthedocs.io)
-- **Issues**: [GitHub Issues](https://github.com/your-username/paperflow-cms/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/your-username/paperflow-cms/discussions)
-- **Email**: support@paperflow.com
-
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
@@ -1753,3 +1746,16 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
     <a href="https://paperflow-cms.readthedocs.io">Documentation</a>
   </p>
 </div>
+
+
+
+## SCREENSHOTS
+
+<img width="1890" height="885" alt="Screenshot 2025-10-07 165742" src="https://github.com/user-attachments/assets/9836843b-419d-4e35-96b1-02950d64810e" />
+
+
+<img width="1889" height="919" alt="Screenshot 2025-10-07 165757" src="https://github.com/user-attachments/assets/433160a4-7d47-4bdb-9a71-f69692b477a3" />
+
+
+
+
