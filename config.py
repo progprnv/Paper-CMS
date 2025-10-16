@@ -5,10 +5,9 @@ class Config:
     """Base configuration class"""
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'paper-cms-super-secret-key-2025-change-this'
     
-    # HARDCODED WORKING DATABASE URL - bypassing all dynamic construction
-    # This should work directly without any parsing issues
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        'postgresql://postgres:Admin%2540123%2523Admin@db.xssqhifnabymmsvvybgx.supabase.co:5432/postgres'
+    # TEMPORARY FIX: Force use hardcoded URL, ignore broken environment variable
+    # The DATABASE_URL env var in Vercel is malformed and causing parsing issues
+    SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:Admin%40123%23Admin@db.xssqhifnabymmsvvybgx.supabase.co:5432/postgres'
     
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ENGINE_OPTIONS = {
