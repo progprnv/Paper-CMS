@@ -56,6 +56,84 @@ def test_db():
             'db_host': safe_db_url
         }, 500
 
+@main.route('/test-simple-connection')
+def test_simple_connection():
+    """Test connection with simplified approach"""
+    try:
+        import psycopg2
+        
+        # Direct connection without SQLAlchemy
+        conn = psycopg2.connect(
+            host='db.xssqhifnabymmsvvybgx.supabase.co',
+            port='5432',
+            database='postgres',
+            user='postgres',
+            password='Admin@123#Admin',
+            sslmode='require',
+            connect_timeout=10
+        )
+        
+        # Test simple query
+        cursor = conn.cursor()
+        cursor.execute('SELECT version();')
+        version = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        
+        return {
+            'status': 'success',
+            'message': 'Direct psycopg2 connection successful',
+            'postgres_version': version[0] if version else 'Unknown'
+        }, 200
+        
+    except Exception as e:
+        return {
+            'status': 'error',
+            'message': f'Direct connection failed: {str(e)}',
+            'error_type': type(e).__name__
+        }, 500
+
+@main.route('/test-multiple-urls')
+def test_multiple_urls():
+    """Test multiple database URL formats"""
+    test_urls = [
+        'postgresql://postgres:Admin%40123%23Admin@db.xssqhifnabymmsvvybgx.supabase.co:5432/postgres',
+        'postgresql://postgres:Admin%2540123%2523Admin@db.xssqhifnabymmsvvybgx.supabase.co:5432/postgres',
+        'postgresql://postgres:AdminAT123SHARPAdmin@db.xssqhifnabymmsvvybgx.supabase.co:5432/postgres'
+    ]
+    
+    results = []
+    for i, url in enumerate(test_urls):
+        try:
+            # Parse the URL to see what host it resolves to
+            parts = url.split('@')
+            if len(parts) >= 2:
+                host_part = parts[1]
+                host = host_part.split(':')[0]
+                results.append({
+                    'url_index': i,
+                    'host_parsed': host,
+                    'url_preview': url[:50] + '...'
+                })
+            else:
+                results.append({
+                    'url_index': i,
+                    'error': 'Could not parse URL',
+                    'url_preview': url[:50] + '...'
+                })
+        except Exception as e:
+            results.append({
+                'url_index': i,
+                'error': str(e),
+                'url_preview': url[:50] + '...'
+            })
+    
+    return {
+        'status': 'ok',
+        'current_config_url': current_app.config.get('SQLALCHEMY_DATABASE_URI', 'Not set')[:80] + '...',
+        'test_results': results
+    }, 200
+
 @main.route('/debug-config')
 def debug_config():
     """Debug configuration - REMOVE IN PRODUCTION"""
