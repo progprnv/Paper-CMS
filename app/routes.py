@@ -10,6 +10,11 @@ import os
 
 main = Blueprint('main', __name__)
 
+@main.route('/favicon.ico')
+def favicon():
+    """Serve favicon"""
+    return '', 204  # Return empty response with No Content status
+
 @main.route('/')
 def index():
     """Homepage"""
